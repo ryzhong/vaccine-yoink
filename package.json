@@ -1,0 +1,27 @@
+{
+  "name": "vaccine-yoink",
+  "version": "1.0.0",
+  "description": "Helps find vaccines in your area",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next -p 3001",
+    "build": "next build",
+    "start": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryzhong/vaccine-yoink.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ryzhong/vaccine-yoink/issues"
+  },
+  "homepage": "https://github.com/ryzhong/vaccine-yoink#readme",
+  "dependencies": {
+    "next": "^10.1.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}
