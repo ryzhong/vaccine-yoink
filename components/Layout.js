@@ -1,4 +1,4 @@
-export default props => (
+const Layout = props => (
     <div>
         <nav>
             <ul>
@@ -10,3 +10,4 @@ export default props => (
         </main>
     </div>
 )
+export default Layout
