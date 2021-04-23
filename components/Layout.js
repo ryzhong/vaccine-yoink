@@ -1,13 +1,11 @@
+import Navbar from './Navbar.js'
+
 const Layout = props => (
     <div>
-        <nav>
-            <ul>
-                <li>Home</li>
-            </ul>
-        </nav>
-        <main>
+        <Navbar />
+        <div>
             {props.content}
-        </main>
+        </div>
     </div>
 )
 export default Layout
