@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import Layout from '../components/Layout.js';
+import Request from '../request/request.js';
+import { getDistance } from 'geolib';
 
 class Index extends React.Component {
     constructor(props) {
@@ -8,8 +10,9 @@ class Index extends React.Component {
         this.state = {
             zip: '',
             distance: '5',
-            aptType: '1',
+            aptType: true,
             vaccineType: 'all',
+            coordinates: [],
         }
 
         this.handleZipChange = this.handleZipChange.bind(this);
@@ -21,27 +24,86 @@ class Index extends React.Component {
 
     handleZipChange(event) {
         console.log(event.target.value)
-        this.setState({zip: event.target.value})
-        
+        this.setState({ zip: event.target.value })
+
     }
 
     handleDistanceChange(event) {
         console.log(event.target.value)
-        this.setState({distance: event.target.value})
+        this.setState({ distance: event.target.value })
     }
 
     handleAptTypeChange(event) {
         console.log(event.target.value)
-        this.setState({aptType: event.target.value})
+        this.setState({ aptType: event.target.value })
     }
 
     handleVaccineChange(event) {
-        this.setState({vaccineType: event.target.value})
+        this.setState({ vaccineType: event.target.value })
     }
 
     handleSubmit(event) {
         event.preventDefault();
-        console.log('submitted')
+        this.getStores()
+    }
+
+    getStores() {
+        Request.getCoorOfZip(this.state.zip)
+            .then(res => {
+                this.setState({ coordinates: res })
+                Request.getZipCodesWithinDistance(res, this.state.distance)
+                    .then(zipCodes => {
+                        console.log(zipCodes)
+                        Request.getAllStoresWithApt()
+                            .then(stores => {
+                                console.log(stores)
+                                let filteredVaccines = this.filterVaccines(this.filterAptType(this.filterByZip(stores, zipCodes)));
+                                console.log(filteredVaccines)
+                                this.setState({filteredVaccines})
+                            })
+                    })
+            })
+    }
+
+    filterByZip(stores, zipCodes) {
+        let filteredStores = [];
+        for (let store of stores) {
+            if (zipCodes.includes(store.properties.postal_code)) {
+                filteredStores.push(store)
+            }
+        }
+        return filteredStores;
+    }
+
+    filterAptType(stores) {
+        let dose2Only = this.state.aptType === '2' ? true : false;
+        return stores.filter( store => {
+            if(dose2Only) {
+                return store.properties.appointments_available_2nd_dose_only && dose2Only
+            }
+            else {
+                return store.properties.appointments_available_all_doses && !dose2Only
+            }
+        })
+    }
+
+    filterVaccines(stores) {
+        if(this.state.vaccineType === 'all' || this.state.vaccineType === 'unknown') {
+            stores.forEach( store => {
+                console.log(store)
+                store.properties.distancesFromZip = getDistance({latitude: this.state.coordinates[0], longitude: this.state.coordinates[1]}, 
+                    {latitude: store.geometry.coordinates[1], longitude: store.geometry.coordinates[0]});
+            });
+            return stores;
+        }
+        stores.filter( store => {
+            return store.properties.appointment_vaccine_types[this.state.vaccineType]
+        })
+        stores.forEach( store => {
+            console.log(store)
+            store.properties.distancesFromZip = 0;
+        })
+        return stores;
     }
 
     render() {
@@ -65,14 +127,14 @@ class Index extends React.Component {
                                     </div>
                                     <div className='form-group'>
                                         <label>Distance</label>
-                                        <select className='distance' onChange={ e => this.handleDistanceChange(e)}>
+                                        <select className='distance' onChange={e => this.handleDistanceChange(e)}>
                                             <option value='5'>5 Miles</option>
                                             <option value='10'>10 Miles</option>
                                             <option value='25'>25 Miles</option>
                                             <option value='50'>50 Miles</option>
                                         </select>
                                     </div>
-                                    <div className='form-group' onChange={ e => this.handleAptTypeChange(e)}>
+                                    <div className='form-group' onChange={e => this.handleAptTypeChange(e)}>
                                         <label>Appointment Type</label>
                                         <select className='aptType'>
                                             <option value='1'>All doses</option>
@@ -81,11 +143,12 @@ class Index extends React.Component {
                                     </div>
                                     <div>
                                         <label>Vaccine Type</label>
-                                        <select className='vaccineType' onChange={ e => this.handleVaccineChange(e)}>
+                                        <select className='vaccineType' onChange={e => this.handleVaccineChange(e)}>
                                             <option value='all'>All Vaccines</option>
                                             <option value='moderna'>Moderna</option>
                                             <option value='pfizer'>Pfizer</option>
                                             <option value='JJ'>Johnson & Johnson</option>
+                                            <option value='unknown'>Unknown (Database not specified)</option>
                                         </select>
                                     </div>
                                     <div className='submitForm'>
@@ -95,9 +158,9 @@ class Index extends React.Component {
                             </div>
 
                         </div>
-                            <div>
-                                
-                            </div>
+                        <div>
+
+                        </div>
                     </div>
 
                     <style jsx>{`
