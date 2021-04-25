@@ -26,23 +26,19 @@ class Index extends React.Component {
     }
 
     handleZipChange(event) {
-        console.log(event.target.value)
         this.setState({ zip: event.target.value })
 
     }
 
     handleDistanceChange(event) {
-        console.log(event.target.value)
         this.setState({ distance: event.target.value })
     }
 
     handleAptTypeChange(event) {
-        console.log(event.target.value)
         this.setState({ aptType: event.target.value })
     }
 
     handleVaccineChange(event) {
-        console.log(event.target.value)
         this.setState({ vaccineType: event.target.value })
     }
 
@@ -58,13 +54,11 @@ class Index extends React.Component {
                 Request.getAllStoresWithApt()
                     .then(stores => {
                         let filteredVaccines = this.filterVaccines(this.filterAptType(this.filterByDistance(stores, coordinates)));
-                        console.log(filteredVaccines)
                         this.setState({ filteredVaccines })
                     })
             })
     }
 
-    //fix this
     filterByDistance(stores, coordinates) {
         let filteredStores = [];
         let meters = this.state.distance * miToMeters;
@@ -76,7 +70,6 @@ class Index extends React.Component {
                 filteredStores.push(store)
             }
         }
-        console.log(filteredStores)
         return filteredStores;
     }
 
@@ -100,13 +93,12 @@ class Index extends React.Component {
             return stores
         }
         stores = stores.filter(store => {
-            console.log(store.properties.appointment_vaccine_types[this.state.vaccineType])
             return store.properties.appointment_vaccine_types[this.state.vaccineType]
         })
         return this.sortDistanceProperty(stores)
     }
 
-    //adds distance from zipcode to store and sorts by accending order
+
     sortDistanceProperty(stores) {
         stores = stores.sort((a, b) => {
             return a.properties.distanceFromZip - b.properties.distanceFromZip
