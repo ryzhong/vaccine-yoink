@@ -7,10 +7,41 @@ class Index extends React.Component {
         super(props);
         this.state = {
             zip: '',
-            distance: 0,
-            aptType: 1,
-            vaccineType: [],
+            distance: '5',
+            aptType: '1',
+            vaccineType: 'all',
         }
+
+        this.handleZipChange = this.handleZipChange.bind(this);
+        this.handleDistanceChange = this.handleDistanceChange.bind(this);
+        this.handleAptTypeChange = this.handleAptTypeChange.bind(this);
+        this.handleVaccineChange = this.handleVaccineChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleZipChange(event) {
+        console.log(event.target.value)
+        this.setState({zip: event.target.value})
+        
+    }
+
+    handleDistanceChange(event) {
+        console.log(event.target.value)
+        this.setState({distance: event.target.value})
+    }
+
+    handleAptTypeChange(event) {
+        console.log(event.target.value)
+        this.setState({aptType: event.target.value})
+    }
+
+    handleVaccineChange(event) {
+        this.setState({vaccineType: event.target.value})
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        console.log('submitted')
     }
 
     render() {
@@ -29,28 +60,28 @@ class Index extends React.Component {
                                 </div>
                                 <form>
                                     <div className='form-group'>
-                                        <label for='zipCode'>Zip Code</label>
-                                        <input type='text' id='zipCode' name='zipCode'></input>
+                                        <label>Zip Code</label>
+                                        <input type='text' id='zipCode' name='zipCode' onChange={e => this.handleZipChange(e)}></input>
                                     </div>
                                     <div className='form-group'>
-                                        <label for='distance'>Distance</label>
-                                        <select className='distance'>
+                                        <label>Distance</label>
+                                        <select className='distance' onChange={ e => this.handleDistanceChange(e)}>
                                             <option value='5'>5 Miles</option>
                                             <option value='10'>10 Miles</option>
                                             <option value='25'>25 Miles</option>
                                             <option value='50'>50 Miles</option>
                                         </select>
                                     </div>
-                                    <div className='form-group'>
-                                        <label for='aptType'>Appointment Type</label>
+                                    <div className='form-group' onChange={ e => this.handleAptTypeChange(e)}>
+                                        <label>Appointment Type</label>
                                         <select className='aptType'>
                                             <option value='1'>All doses</option>
                                             <option value='2'>Second doses only</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label for='vaccineType'>Vaccine Type</label>
-                                        <select className='vaccineType'>
+                                        <label>Vaccine Type</label>
+                                        <select className='vaccineType' onChange={ e => this.handleVaccineChange(e)}>
                                             <option value='all'>All Vaccines</option>
                                             <option value='moderna'>Moderna</option>
                                             <option value='pfizer'>Pfizer</option>
@@ -58,7 +89,7 @@ class Index extends React.Component {
                                         </select>
                                     </div>
                                     <div className='submitForm'>
-                                        <button className='submitButton'>Submit</button>
+                                        <button className='submitButton' onClick={e => this.handleSubmit(e)}>Submit</button>
                                     </div>
                                 </form>
                             </div>
