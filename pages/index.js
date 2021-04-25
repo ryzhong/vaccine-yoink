@@ -4,6 +4,9 @@ import Layout from '../components/Layout.js';
 import Request from '../request/request.js';
 import { getDistance } from 'geolib';
 
+const metersToMi = 0.000621371;
+const miToMeters = 1609.34;
+
 class Index extends React.Component {
     constructor(props) {
         super(props);
@@ -39,7 +42,7 @@ class Index extends React.Component {
     }
 
     handleVaccineChange(event) {
-        console.log(event.target.value )
+        console.log(event.target.value)
         this.setState({ vaccineType: event.target.value })
     }
 
@@ -50,26 +53,26 @@ class Index extends React.Component {
 
     getStores() {
         Request.getCoorOfZip(this.state.zip)
-            .then(res => {
-                this.setState({ coordinates: res })
-                Request.getZipCodesWithinDistance(res, this.state.distance)
-                    .then(zipCodes => {
-                        console.log(zipCodes)
-                        Request.getAllStoresWithApt()
-                            .then(stores => {
-                                console.log(stores)
-                                let filteredVaccines = this.filterVaccines(this.filterAptType(this.filterByZip(stores, zipCodes)));
-                                console.log(filteredVaccines)
-                                this.setState({filteredVaccines})
-                            })
+            .then(coordinates => {
+                this.setState({ coordinates })
+                Request.getAllStoresWithApt()
+                    .then(stores => {
+                        let filteredVaccines = this.filterVaccines(this.filterAptType(this.filterByDistance(stores, coordinates)));
+                        console.log(filteredVaccines)
+                        this.setState({ filteredVaccines })
                     })
             })
     }
 
-    filterByZip(stores, zipCodes) {
+    //fix this
+    filterByDistance(stores, coordinates) {
         let filteredStores = [];
+        let meters = this.state.distance * miToMeters;
         for (let store of stores) {
-            if (zipCodes.includes(store.properties.postal_code)) {
+            let distance = getDistance({ latitude: coordinates[0], longitude: coordinates[1] },
+                { latitude: store.geometry.coordinates[1], longitude: store.geometry.coordinates[0] });
+            if( meters > distance) {
+                store.properties.distanceFromZip = distance;
                 filteredStores.push(store)
             }
         }
@@ -79,11 +82,11 @@ class Index extends React.Component {
 
     filterAptType(stores) {
         let dose2 = false;
-        if(this.state.aptType === '2') {
+        if (this.state.aptType === '2') {
             dose2 = true;
         }
-        return stores.filter( store => {
-            if(dose2) {
+        return stores.filter(store => {
+            if (dose2) {
                 return store.properties.appointments_available_2nd_dose_only
             }
             else {
@@ -93,23 +96,19 @@ class Index extends React.Component {
     }
 
     filterVaccines(stores) {
-        if(this.state.vaccineType === 'all' || this.state.vaccineType === 'unknown') {
-            return this.addDistanceProperty(stores)
+        if (this.state.vaccineType === 'all' || this.state.vaccineType === 'unknown') {
+            return stores
         }
-        stores = stores.filter( store => {
+        stores = stores.filter(store => {
             console.log(store.properties.appointment_vaccine_types[this.state.vaccineType])
             return store.properties.appointment_vaccine_types[this.state.vaccineType]
         })
-        return this.addDistanceProperty(stores)
+        return this.sortDistanceProperty(stores)
     }
 
     //adds distance from zipcode to store and sorts by accending order
-    addDistanceProperty(stores) {
-        stores.forEach( store => {
-            store.properties.distanceFromZip = getDistance({latitude: this.state.coordinates[0], longitude: this.state.coordinates[1]}, 
-                {latitude: store.geometry.coordinates[1], longitude: store.geometry.coordinates[0]});
-        });
-        stores = stores.sort( (a, b) => {
+    sortDistanceProperty(stores) {
+        stores = stores.sort((a, b) => {
             return a.properties.distanceFromZip - b.properties.distanceFromZip
         })
         return stores;
