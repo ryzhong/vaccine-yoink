@@ -10,7 +10,7 @@ class Index extends React.Component {
         this.state = {
             zip: '',
             distance: '5',
-            aptType: true,
+            aptType: '1',
             vaccineType: 'all',
             coordinates: [],
         }
@@ -39,6 +39,7 @@ class Index extends React.Component {
     }
 
     handleVaccineChange(event) {
+        console.log(event.target.value )
         this.setState({ vaccineType: event.target.value })
     }
 
@@ -72,36 +73,44 @@ class Index extends React.Component {
                 filteredStores.push(store)
             }
         }
+        console.log(filteredStores)
         return filteredStores;
     }
 
     filterAptType(stores) {
-        let dose2Only = this.state.aptType === '2' ? true : false;
+        let dose2 = false;
+        if(this.state.aptType === '2') {
+            dose2 = true;
+        }
         return stores.filter( store => {
-            if(dose2Only) {
-                return store.properties.appointments_available_2nd_dose_only && dose2Only
+            if(dose2) {
+                return store.properties.appointments_available_2nd_dose_only
             }
             else {
-                return store.properties.appointments_available_all_doses && !dose2Only
+                return store.properties.appointments_available_all_doses
             }
         })
     }
 
     filterVaccines(stores) {
         if(this.state.vaccineType === 'all' || this.state.vaccineType === 'unknown') {
-            stores.forEach( store => {
-                console.log(store)
-                store.properties.distancesFromZip = getDistance({latitude: this.state.coordinates[0], longitude: this.state.coordinates[1]}, 
-                    {latitude: store.geometry.coordinates[1], longitude: store.geometry.coordinates[0]});
-            });
-            return stores;
+            return this.addDistanceProperty(stores)
         }
-        stores.filter( store => {
+        stores = stores.filter( store => {
+            console.log(store.properties.appointment_vaccine_types[this.state.vaccineType])
             return store.properties.appointment_vaccine_types[this.state.vaccineType]
         })
+        return this.addDistanceProperty(stores)
+    }
+
+    //adds distance from zipcode to store and sorts by accending order
+    addDistanceProperty(stores) {
         stores.forEach( store => {
-            console.log(store)
-            store.properties.distancesFromZip = 0;
+            store.properties.distanceFromZip = getDistance({latitude: this.state.coordinates[0], longitude: this.state.coordinates[1]}, 
+                {latitude: store.geometry.coordinates[1], longitude: store.geometry.coordinates[0]});
+        });
+        stores = stores.sort( (a, b) => {
+            return a.properties.distanceFromZip - b.properties.distanceFromZip
         })
         return stores;
     }
