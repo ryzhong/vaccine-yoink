@@ -2,7 +2,6 @@ import React from 'react';
 import { DateTime } from "luxon";
 
 const Stores = props => {
-    console.log(props.store)
     let address = '';
     let time = DateTime.fromISO(props.store.properties.appointments_last_modified);
     let available_vaccines = '';

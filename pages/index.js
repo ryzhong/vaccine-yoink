@@ -50,14 +50,21 @@ class Index extends React.Component {
     }
 
     getStores() {
-        Request.getCoorOfZip(this.state.zip)
-            .then(coordinates => {
-                this.setState({ coordinates })
-                Request.getAllStoresWithApt()
-                    .then(stores => {
-                        let filteredStores = this.sortDistanceProperty(this.filterVaccines(this.filterAptType(this.filterByDistance(stores, coordinates))));
-                        this.setState({ filteredStores })
+        Request.getAllZips(this.state.zip)
+            .then( result => {
+                if(this.state.zip in result){
+                    Request.getCoorOfZip(this.state.zip)
+                    .then(coordinates => {
+                        this.setState({ coordinates })
+                        Request.getAllStoresWithApt()
+                            .then(stores => {
+                                let filteredStores = this.sortDistanceProperty(this.filterVaccines(this.filterAptType(this.filterByDistance(stores, coordinates))));
+                                this.setState({ filteredStores })
+                            })
                     })
+                } else {
+                    alert('Please input valid CA zip code.')
+                }
             })
     }
 
