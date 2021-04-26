@@ -43,7 +43,8 @@ const Navbar = () => {
                     text-decoration: none;
                     font-weight: bold;
                     color: #069;
-                    border-right: 1px solid #ccc; }
+                    border-right: 1px solid #ccc;
+                    border-left: 1px solid #ccc; }
             `}</style>
         </div>
     )
