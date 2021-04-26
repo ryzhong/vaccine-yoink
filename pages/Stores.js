@@ -1,5 +1,5 @@
 import React from 'react';
-import StoreEntry from './storeEntry'
+import StoreEntry from './StoreEntry.js'
 
 const Stores = props => {
     if(!props.stores) {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Layout from '../components/Layout.js';
 import Request from '../request/request.js';
 import { getDistance } from 'geolib';
-import Stores from '../components/Stores.js'
+import Stores from './Stores.js'
 
 const metersToMi = 0.000621371;
 const miToMeters = 1609.34;
