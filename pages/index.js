@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Layout from '../components/Layout.js';
 import Request from '../request/request.js';
 import { getDistance } from 'geolib';
+import Stores from '../components/Stores.js'
 
 const metersToMi = 0.000621371;
 const miToMeters = 1609.34;
@@ -16,6 +17,7 @@ class Index extends React.Component {
             aptType: '1',
             vaccineType: 'all',
             coordinates: [],
+            filteredStores: [],
         }
 
         this.handleZipChange = this.handleZipChange.bind(this);
@@ -53,8 +55,8 @@ class Index extends React.Component {
                 this.setState({ coordinates })
                 Request.getAllStoresWithApt()
                     .then(stores => {
-                        let filteredVaccines = this.filterVaccines(this.filterAptType(this.filterByDistance(stores, coordinates)));
-                        this.setState({ filteredVaccines })
+                        let filteredStores = this.sortDistanceProperty(this.filterVaccines(this.filterAptType(this.filterByDistance(stores, coordinates))));
+                        this.setState({ filteredStores })
                     })
             })
     }
@@ -66,7 +68,7 @@ class Index extends React.Component {
             let distance = getDistance({ latitude: coordinates[0], longitude: coordinates[1] },
                 { latitude: store.geometry.coordinates[1], longitude: store.geometry.coordinates[0] });
             if( meters > distance) {
-                store.properties.distanceFromZip = distance;
+                store.properties.distanceFromZip = (distance * metersToMi).toFixed(2);
                 filteredStores.push(store)
             }
         }
@@ -159,7 +161,7 @@ class Index extends React.Component {
 
                         </div>
                         <div>
-
+                            <Stores stores={this.state.filteredStores}/>
                         </div>
                     </div>
 
