@@ -23,7 +23,7 @@ const getAllStoresWithApt = () => {
 }
 
 //gets all zip codes within a specific coordinate
-const getCoorOfZip = (zipCode, cb) => {
+const getCoorOfZip = (zipCode) => {
     return axios.get(`https://public.opendatasoft.com/api/records/1.0/search/?dataset=geonames-postal-code&q=&facet=country_code&facet=admin_name1&facet=admin_code1&facet=admin_name2&facet=postal_code&refine.country_code=US&refine.admin_name1=California&refine.postal_code=${zipCode}`)
         .then(res => {
             // cb(res.data.records[0].fields.coordinates)
@@ -32,4 +32,9 @@ const getCoorOfZip = (zipCode, cb) => {
         .catch( err => console.log(err))
 }
 
-export default {getAllStoresWithApt, getCoorOfZip}
+const getAllZips = () => {
+    return axios.get(`https://www.vaccinespotter.org/api/v0/states/CA/postal_codes.json`)
+                    .then(res => res.data)
+}
+
+export default {getAllStoresWithApt, getCoorOfZip, getAllZips}
