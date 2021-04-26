@@ -120,14 +120,14 @@ class Index extends React.Component {
             <Layout content={(
                 <div>
                     <div>
-                        <h1 className='home'>Vaccine Yoink</h1>
+                        <h1 className='home'>Vaccine Yoink - California</h1>
                     </div>
 
                     <div>
                         <div className='form-container'>
                             <div>
                                 <div className='header'>
-                                    <h2>Search for available appointments</h2>
+                                    <h2>Search for available appointments in California</h2>
                                 </div>
                                 <form>
                                     <div className='form-group'>
