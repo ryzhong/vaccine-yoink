@@ -13,7 +13,6 @@ const Stores = props => {
     }
     for(let vaccine in props.store.properties.appointment_vaccine_types) {
         let vaccineName = vaccine === "jj" ? "Johnson & Johnson" : vaccine;
-        console.log(vaccineName)
         if(available_vaccines === '') {
             available_vaccines += vaccineName
         } else {
