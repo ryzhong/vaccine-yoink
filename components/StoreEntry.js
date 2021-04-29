@@ -12,7 +12,13 @@ const Stores = props => {
         address = `Address not available. Please check on ${props.store.properties.provider_brand_name} website`;
     }
     for(let vaccine in props.store.properties.appointment_vaccine_types) {
-        available_vaccines += " " + vaccine
+        let vaccineName = vaccine === "jj" ? "Johnson & Johnson" : vaccine;
+        console.log(vaccineName)
+        if(available_vaccines === '') {
+            available_vaccines += vaccineName
+        } else {
+            available_vaccines += ", " + vaccineName
+        }
     }
     return (
         <div>
